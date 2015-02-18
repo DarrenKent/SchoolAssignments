@@ -1,0 +1,466 @@
+About the Game Engine
+
+This assignment will serve as an introduction to making a 3D program. We will be using a full 3D Game Engine called Panda3D to make a race car game. Panda3D was originally developed by Disney for one of their attractions called "Aladdin's Magic Carpet Ride". Over time they expanded the Game Engine and started using if for several of their games, most noteably Toontown Online and Pirates of the Caribbean Online (an MMORPG).
+
+What can Panda3D do?
+Well Panda3D can do just about anything. Panda3D has a full Features set including:
+    • Full Graphics API (Can use both OpenGL and DirectX)
+    • 3D Pipeline (You can bring in models from just about any modeler)
+    • Audio (OpenAl, FMOD, and Miles audio engine compatable)
+    • Physics (Several built in physics engines)
+    • Particle Effects (A full Particle System for creating smoke, fire, etc.)
+    • GUI (Built in 2D rendering space as well as several basic GUI methods for easy set up)
+    • AI (Several Artificial Intelligent behaviors preconfigured)
+    • and much more...
+
+Panda3D was written in C++ but uses Python as its main programing language. However you can also use C++ with the engine if desired. We of course will only be using Python.
+
+About our Project
+
+As stated above our project will be to build a 3D racing game. This will not be a full racing game, but we will be able to place our track and our car and be able to drive around the track. All of the 3D models will be given to you, you just have to put the game together. Part 1 we will be building the world. Part 2 we will be putting together game mechanics. And Part 3 will be to make the game your own. This assignment is written in a tutorial fashion. You will be jumping between files but the coding will be very linear and you will be working in steps so that you can test your code often.
+
+As stated above our project will be to build a 3D racing game. This will not be a full racing game, but we will be able to place our track and our car and be able to drive around the track. All of the 3D models will be given to you, you just have to put the game together. Part 1 we will be building the world. Part 2 we will be putting together game mechanics. And Part 3 will be to make the game your own. This assignment is written in a tutorial fashion. You will be jumping between files but the coding will be very linear and you will be working in steps so that you can test your code often
+
+Throughout this assignement you will see little blocks that will provide usefull information. They are not neccissary but will help you learn and excell at this project:
+ • TEST: You will see this comment anytime you can test and what you will see.
+ • TIP: These are usually comments on how to make things easier for you
+ • CAUTION: This information will help you prevent your program from breaking.
+ • NOTE: These are helpful information on how to use specific Panda3D features.
+ 
+
+Lets get started
+If you are using your own computer you will need to install Panda3D. You can get it from http://panda3d.org . You should download version 1.7.* as 1.8 is still not stable. Don't worry if you don't have python installed Panda3D is bundled with it so that runs right after installing. The assignment instructions are for Windows machines. There are installations for Linux and Mac but installing them can be a bit tedious. If you wish to try and install them and do the assignment feel free to, but know there will be no support here for those machines.
+
+TIP:
+You will need to run Panda3D application from the command prompt. One of the biggest complaints about windows command prompt is navigating. You can use this little trick to make it easier.
+    • Open the Folder where your project will be stored
+    • Click Start
+    • In the search bar, search for cmd.exe
+    • Right Click and drag cmd.exe to the folder where your project will be
+    • When the Menu appears select copy here (Do Not Create a Shortcut, you need to copy it)
+    • You should now have a cmd.exe in your project folder. When you double click it, it should be automatically navigated to the folder you are working in.
+    
+Running a Panda3D application is slightly different than running a normal python application.
+    Normal Command line: python filename.py
+    Panda3D Command Line: ppython filename.py
+    CAUTION: The extra p before python...this is not a typo.
+    
+    You can run the Racer game now to see what you will be building. For Part 1 and Part 2 pyc files have been given to you. You will create your own files to replace those pyc files. All you need to do is type:
+        ppython main.py
+    into the command prompt and it will run.
+
+Part 1
+
+In Part 1 we will setup the inital game world and game loop. You will place a few models and lights to light up your scene and set up the keybindings so we can control the game.
+
+File: main.py
+    The purpose of this file is to execute our main program. You will also be using this file to list the features you put into the game during Part 3. This file is given to you.
+    
+    Imports:
+        import gamesol as game
+        
+        Once you have created your game.py file you will change this to:
+            import game
+            
+    Code:
+        Function: main()
+            This function creates an instance of our game and runs it.
+            
+File: game.py
+    The purpose of this file is run our main program. It will handle all of our Panda3D Engine elements as well as act as our main game loop.
+    
+    Imports:
+        We will need to start by importing a few modules from Panda3D. Don't worry if you don't understand fully what they do right now, you will understand them when we get to using them. We will import individual modules rather than the whole Panda3D Library. This is because Panda3D is huge and we don't want to import a bunch of stuff we will not use.
+            from direct.showbase.ShowBase import Showbase
+            from panda3d.core import loadPrcFileData
+            import sys
+            import worldsol as world
+            import carsol as car
+            
+        CAUTION: For now comment out the world and car import lines until you create those files. If you do not your code will break until they are created.
+            
+    Code:
+        Alright now that imports are out of the way lets start by creating our first Class. This class is the GameController class: It inherits from Panda3D's ShowBase. ShowBase is pretty much Panda3D's window and system handler.
+        
+        Class: GameConroller(ShowBase)
+            Method: __init__(self)
+                GameConroller's constructor does not take anything in but it will handle creating several things.
+                The first thing we normally do is call the parent classes constructor, but we will do that in just a minute. 
+                
+                First we will initiallize some settings in Panda3D's config files. To do this we call a function called loadPrcFileData(filename,settings). The filename is the name of the config file, we will leave this as an empty string, which will tell Panda3D to use the default file. The settings parameter is a string of the setting we want to change. The reason we change the settings like this is so that it will revert back to default settings on other projects. It will change these settings every time we create our GameController class.
+                The settings we will change are:
+                    'fullscreen 0'
+                    'win-size 800 600'
+                    'window-title Racer'
+                    'force-parasite-buffer #t'
+                You will need to call loadPrcFileData() on each of those. The first setting tells the program to run in windowed mode. The second one tells the program to run in 800x600 pixel mode. The third tells our window to be named Racer. The fourth is a signal to use ParasiteBuffers. You don't need to understand what that is just that it will fix some issues that would otherwise come up when we do our shadows. You can mess with these settings if you like. There are also more settings at https://www.panda3d.org/manual/index.php/Configuring_Panda3D if you wish to change more.
+                CAUTION: The program will crash if you try to run a resolution in fullscreen that is not one of your computer's standard resolutions. The error will be: StandardError: Could not open window.
+                
+                Now that all of that is done we need to call our parent class constructor. It does not take any paramaters other than self.
+                
+                TEST: If you run what you have now you will have a grey box with your title in the titlebar.
+                
+                That grey box is kind of an anoying color so just for the sake of doing it we are going to change it to a black. To do this you will call setClearColor(color) on the base window. To gain access to the base window you will use the following code:
+                    base.win.setClearColor((r,g,b,a))
+                
+                Colors: Notice that we are using a tuple for our color (r,g,b,a). r = Red, g = Green, b= Blue, a = Alpha. These values will range from 0 to 1 and are represented as a float. I.E. grey would be (.25,.25,.25,1). You always want your alpha set to 1 unless you are messing with transparency, which we are not. So to create black you will use (0,0,0,1) for your tuple. If you want to create a color using the standard RGB values (i.e. 255,255,255) just divide your disired color num by 255.
+                I.E. a (100,100,100) grey would be (.39,.39,.39) as 100/255 = .39. All Panda3D colors can be handled this way.
+                
+                Our next step in the constructor is to disable Panda3Ds base mouse camera movement. To do this you will call:
+                    base.disableMouse()
+                Panda3D has a default way to move the camera. This can be useful to move around the world to view it, but that is not how we will want to play the game. You can comment this line out at anytime and it will override most of the camera settings we apply. The movement can be a bit tricky though. To "Zoom" in and out you right click and drag. To "Pan" you left click and drag. And to "Rotate" middle click and drag.
+                
+                Next we will call some helper methods to do some tasks for us. You will need to call SetupWorld,SetupCar,SetupCamera,SetupLights, and SetupKeys. It would also be wise to quickly write placeholder methods for these real quick so we can continue to test our code as we go. Just have them pass for now we will write them shortly.
+                
+                Lastly we need to add our main game loop to the task manager. To access add a task to the task manager you would call something like this
+                    taskMgr.add(method,'task name')
+                The object taskMgr is part of the Panda3D ShowBase so we don't have to retrieve it from anywhere. The add method takes two paramaters. Method is the method you wish to act as a game loop and the 'task name' is a string that you can refer to for the task loop. For us you will use the following to add our main Game Loop:
+                    taskMgr.add(self.GameLoop,'Game Loop')
+                CAUTION: Notice that self.GameLoop does not have parenthese after it. This is because it is a reference not the actual method call. taskMgr will do the method call for us.
+                
+                You will also need to go and create your GameLoop placeholder Method. For now use this Code to get you started:
+                    def GameLoop(self,task):
+                        return task.cont
+                We will discuss what it does later.
+                
+            Method: SetupKeys(self)
+                The next method we will write is SetupKeys. This helper method sets up keybindings so that we will have control over our game. To set up the keystrokes we will need to create a class dictionary called keyMap. A dictionary is simialr to a list but is structured in a way that we can pull information from it using a specific key rather than an index. To create a dictionary you use { } instead of [ ]. So to create our keyMap dictionary it will be something like:
+                    self.keyMap = { }
+                But before we can move on we need to fill in some information into the dictionary. To add information to a dictionary you put your key a colon and then the value. For example:
+                    self.keyMap = { key:value,
+                                    key:value,
+                                    key:value
+                                  }
+                Place the following information into our dictionary..
+                    Key             Value
+                    'accelerate'    0
+                    'deccelerate'   0
+                    'left'          0
+                    'right'         0
+                Once those are entered in our dictionary is completed. If you wanted to add other keystrokes with different functions you would have to add them to the dictionary. But these are the only ones we will use for now.
+                
+                Next we need to tell panda to accept the keys. To do this you will use a ShowBase method called accept(key,method,value). The key is a string that contains the keystroke. I.E. The 'a' key on the keyboard is simply 'a'. Some keys must be spelt out like the 'Esc' key is escape. Also it is important to note that by puting the key it self down it is processed when the key is down. If you want to process the binding when it is release you add '-up' to the end of the string. I.E. the 'a' key released would be 'a-up'. The method is the method called when the key event occurs and value is the value passed into that method as a paramater.
+                
+                NOTE: More information on Keyboard Setup can be found at https://www.panda3d.org/manual/index.php/Keyboard_Support
+                
+                The keybinding you need to set up are:
+                    Key                 Method              Value
+                    'escape'            sys.exit            * Only pass in the key and method
+                    'w'                 self.setKey         ['accelerate',1]
+                    'w-up'              self.setKey         ['accelerate',0]
+                    's'                 self.setKey         ['deccelerate',1]
+                    's-up'              self.setKey         ['deccelearte',0]
+                    'a'                 self.setKey         ['left',1]
+                    'a-up'              self.setKey         ['left',0]
+                    'd'                 self.setKey         ['right',1]
+                    'd-up'              self.setKey         ['right',0]
+                    
+                Again if you wanted other keys you would have to set them up in a similar fashion.
+                We are going to quickly write one more method then we can test to see if our keybindings are working. Since we refer to self.setKey we must write it next
+                
+            Method: setKey(self,key,value)
+                This is a helper method setup to access our keyMap dictionary and change the values. It is used in conjunction with our SetupKeys to record what keys are being pressed. To do this we are simply going to change the value of self.keyMap at the index location of our key. You do this the exact same way you would change the value of a list but use the key instead of an index value.
+                
+                TEST: Once this method is written you can test your code. Nothing will appear different and most of your keys will do nothing, accept now if you press the escape key it should exit the program.
+                
+                
+            Method: SetupWorld(self)
+                The next method we will setup is SetupWorld. This method will generate a class instance of our world and add that to our 3D scene. we will simply just create an instance of our world class and store it as a class variable for later reference. Our world class takes one paramater our instance of ShowBase other wise known as self. Do this by using this code:
+                    self.world = world.World(self)
+                
+                CAUTION: Don't forget to uncomment the world import at the top. Otherwise this method will throw and error when we go to test it later.
+                    
+File: world.py
+    We are going to jump into our world.py file for a few minutes and create our world class. This class will contain all of the information about the world for us including our models and lights.
+    
+    Imports:
+        We need to import a few Panda3D features in this file
+        
+            from panda3d.core import AmbientLight
+    Code:
+        Class: World
+            This class is all of our world information.
+        
+            Method: __init__(self,panda)
+                Our constructor only takes one paramater other than self. We are going to call this panda. It is essentially our Panda3D Showbase so that we can access it and add things to it like our models. The first thing we need to do is save it a class variable so that we can access it in all of our methods.
+                
+                Now that is done we are going to call some helper methods to setup our world. They are: SetupWorld and SetupLights.
+                
+            Method: SetupWorld(self)
+                First lets add our Track model. To add models to the Panda3D scene we must first load them into memory. To do this we execute:
+                    loader.loadModel(filename)
+                Where filename is a string containing the location and filename. You always want to store those models into class vairables as well, so we can manipulate them in the future. So lets load our track model. The code will look like this:
+                    self.track = self.panda.loader.loadModel('Models/track.egg')
+                The Last thing we must do is reparent it to the scene so it shows up. Basically by reparenting a model to the scene we are telling Panda3D where the model belongs in the scene. The primary 3D scene is called render. You can also reparent models to other models and they will use the coordinate system of that model for placement. We will use that example when we get to the car, but for now we will reparent the world to render. If you do not reparent a model to the existing world or visible model, it will never show up on screen. This can be usefull for other applications such as if you wanted to load all of your models before "drawing" them. Our world is small enough that we will not need to do that. So to reparent our world model you use this line of code:
+                    self.track.reparentTo(render)
+                
+                TEST: You can now run your program and your track will appear. It may be difficult to see however. If you want you can go back to game.py and comment out base.disableMouse() to beable to move the camera around.
+                
+                Now that we have our track placed lets place our skybox. After all we dont want to just stair into black nothingness. Use the same method as above to add 'Models/skybox.egg'.
+                
+                TEST: Now your skybox should be applied to the world and we now have a track and sky.
+                
+            Method: SetupLights(self)
+                Now that we have some models placed lets make them look a little bit better. Since this is just a beginners assignement we won't do much with lights. But we will place a few to give the effect of daylight.
+                
+                For starters we are going to apply a light directly to the skybox. Right now it looks kind of bland so we want it to be a bit brighter like a real sky. First we need to create our light. The best light for this type of opperation is an Ambient light so that it applies the light smoothly.
+                To create an Ambient Light we just use Panda3Ds Ambient light object:
+                    variable = AmbientLight('light name')
+                Where 'light name' is a string that you can identify the light by. Store this light in a class variable. Next we need to attach it to the scene. Unlike the models we cannot attach a light directly to the scene and be able to manipulate it so we need to create an empty Panda Node and attach the light to the node. Most of our light transformation will then be applied to the Panda Node. We can create a node and attach the light in one swoop by using:
+                    lightNode = render.attachNewNode(light)
+                Where lightNode is a variable name you give the light node and light is the light object we are attaching to it. After we attach the Ambient Light to the node we need to set up the color of our light. We apply this change directly to the light by calling setColor(color). Use the color discription above to set up the color. In this case we will want Red, Green and Blue to all be 1 for the brightest light possible.
+                
+                Lastly we need to tell the light what it is allowed to light. In this case we only want to light up the sky box so we call:
+                    self.skybox.setLight(lightNode)
+                This will make it so that the light will only illuminate the skybox. If we wanted it to illuminate everything you would do render.setLight(lightNode).
+                
+                Now that you know how to set up an Ambient Light set up one more Ambient light to illuminate everything else. To make this easy just illuminate everything, including the skybox with this one. It will only make it a bit brighter. For the color you could use something like (.7,.7,.5,1) to give more of a daylight type glow.
+            
+                TEST: You can now run with the two new lights applied and you should notice a huge difference in the look of the scene. If you test inbetween creating the two light you may not notice as big of a difference, but the two lights together make it look like we are out in the sun. That is how almost all games are create with 100s of lights. The trick is only to illuminate what you need to.
+                
+                The last thing we need to do with this method is make sure that shadows will be applied to our world. Since we don't want to eat up too many resources we only want to apply shadows to what we will need. For example we don't need/want shadows on our skybox. To apply shadows you call setShaderAuto() on the object you wish shadows to be applied to, which in this case is our world only. Even though we are applying shadows to the world we will not see any for a bit. We need to set up some lights that will generate shadows, but that will come later.
+        
+            Method: WorldFrame(self)
+                This method will be called every frame during our game loop. In the case of our world it doesn't do much since it is static. We don't need to change anything in the world itself but it might be nice to have our clouds move instead of being static. We can simulate our clouds moving simply by rotating our skybox. 
+                
+                You can rotate an object about 3 axis (Yaw,Pitch,Roll) or (H,P,R) as Panda3D refers them. Think of these as the axis of an airplane. Yaw will rotate the object left and right about its center. Pitch tilts the object down or up about its center. And Roll rotates the object like a barrel roll about its center. For the skybox we only need to rotate the object left or right so in this case the Yaw or H. In Panda3d you can rotate an object one of two ways, by directly changing one of its axis (setH(value),setP(value),setR(value)) or by changing all of them at once (setHpr(value,value,value)). 
+                
+                Since we only need to rotate Yaw, use setH(value). This is called on the object we stored for our skybox. The value can be a bit tricky though. First we don't want to just set its location, so we need to retrieve its current position. Then we need to add to it to cause it to rotate. What we want to add is what is tricky. If we just have it rotate 1 degree every frame it will rotate really fast. So to offset that we can use Panda3D's base clock and use it to calculate our value. You get this value by calling globalClock.getDt(). Even with that applied it will be a bit fast so we are going to multiply it by .5 so slow it down a bit. In the end you should have something like this:
+                    self.skybox.setH(self.skybox.getH()+(.5 * globalClock.getDt()))
+                    
+                Ok now that we have that written, lets go back to game.py and set up our initial GameLoop.
+                
+File: game.py
+    Code:
+        Method: GameLoop(self,task)
+            This Method is our main game loop. By adding it to the task manager earlier Panda will call it every frame. Before you where told to add return task.cont . This tells the game loop to continue in the task manager. Here we will tell the game what we want it to do. Also it will watch for our keystrokes and execute code based on the keys. Throughout the rest of these instructions you will need to add more to the GameLoop. Pay close attention to make sure that everything gets added.
+            
+            For now all we are going to do is call our WorldFrame method that we created above.
+            
+            TEST: You should be able to run your code now and our skybox should be rotating very slowly
+            
+Part 1 Completion:
+    Double check everything is running fine with no errors. You should now have a 3D track and Skybox placed in your world with a couple of lights applied to them. Your skybox should also be rotaing slowly to simulate clouds moving.
+    
+Part 2
+
+In Part 2 we will add the car to the world and set it up so that we can drive around. We will also need to set up collision so that we run into walls.
+
+File: game.py
+    Code:
+        Method: SetupCar(self)
+            First thing we will need to do to set up our car is create an instance of our car. You havn't created the car class yet but doing this before had will allow us to test our car as we build it. Make sure that you store the instance of our car into a class variable. Use the World object as an example as how to set our car up. We will need to manipulate it later to move.
+            
+            CAUTION: Make sure you uncomment the car import up at the top so that we don't get errors when we test laters. Also if you commented out base.disableMouse() you will want to uncomment it out as we will be setting up the camera here shortly.
+            
+File: car.py
+    This file is going to contain all of the information about our car.
+    
+    Imports:
+        from panda3d.core import Spotlight
+        from panda3d.core import CollisionTraverser, CollisionSphere, CollisionHandlerQueue, CollisionHandlerPusher, CollisionNode, BitMask32
+        import math
+    Code:
+        Class: Car
+            This class is our car and all its relative information
+            
+            Method: __init__(self,panda)
+                Like with our World model the only paramater that our Car class will take in is an instance of ShowBase, we will call it panda for now. Make sure to store it in a class variable as well. We also need to create a class variable to store our current acceleration in. Set it initially to 0 as we start from rest.
+                
+                After you have that stored we are going to call several helper methods to create our car. They are the following: SetupCar, SetupCamera, SetupLights, and SetupCollisions. For now just create placeholders with pass for their content.
+    
+            Method: SetupCar(self)
+                What better place to start our car than to place our car. Our car is our base model. We will then attach Tires to it. We use two seperate models so that we can do seperate manipulations. For example if say we want the car to just slide forward but I want the tires to turn.
+                
+                Placing the car is no different than when we placed the world. The models where even created in a way that you don't have to mess with position right now. So just load the model into a class variable and reparent it to render for now. The file for the car is 'Models/camaro.egg'
+                
+                Now comes the tricky part we need to attach the tires. Since tires all look the same we are just going to use one model for all four. We do however need to create four different instances. The file for the tires is 'Models/tire.egg'.
+                
+                TIP: It would be suggested that you give these tires names so that you know which ones they are (I.E. DriverFrontTire,DriverRearTire,PassFrontTire,PassRearTire). This will come in handy for later.
+                Also make sure they are class variables.
+                
+                Load them like you have done before, but this time instead of reparenting to render lets reparent them to our car model we loaded. By doing this when we move the car we will not need to move the tires they will just stay in the position we place them based on the car's coordinates. The last thing we need to do for the tire is place them in the correct position of the car. We can do this by calling setPos(x,y,z) on each tire. x,y,z being the coordinate location. Lucky for you we are giving you the coordinates of where they need to be placed. You will also need to rotate two of the tires so they are facing the right direction. Use setH(value) on the two tires that will need to be rotated. Do not add the current H value to it as we did before. Just set the H value to shown below.
+                
+                    Tire                    Position            Rotation
+                    DriverFrontTire         (-70,122,28)        0
+                    DriverRearTire          (-70,-110,28)       0
+                    PassFrontTire           (70,122,28)         180
+                    PassRearTire            (70,-110,28)        180
+                    
+                TEST: After you have setup above you can run and test your code. You should see the bottom of your car. If you comment the base.disableMouse() you can view the car better. Just be sure to uncomment it so that our camera does not get messed up.
+                
+            Method: SetupCamera(self):
+                Panda3D as stated before has a built in camera to ShowBase. This camera can be referenced by based.camera. The first thing we want to do is attach the camera to the car so it follows it when we move. Do this by reparenting the camera to the car, just like we did with the tires.
+                
+                After you get it attached lets reposition it so we can see our car. Do this just like we moved the tires by using setPos(x,y,z). The position we want the camera is (0,-1000,300). This will position the camera behind the car and slightly above it.
+                
+                We are not quite done yet. We want to tweak the camera angle just a bit. To do this we are going to create a helper node. This is an empty panda node that will be completely invisible. But we can set a position to it so we have something for our camera to look at. To create an empty node use the following code:
+                    self.cameraTarget = render.attachNewNode("Camera Target")
+                Once you have that created set its position to (0,0,200). Lastly tell the camera to look at the camera target. Do this by calling lookAt:
+                    base.camera.lookAt(self.cameraTarget)
+                    
+                TEST: Now you can run your program and the camera should be looking at a downward angle onto the car from behind.
+                
+            Method: SetupLights(self)
+                Next we are going to set up some lights to illuminate our car. We have our Ambient Light applied to the world but our car still looks dull. As stated before we don't want to set up lights that effect everything. The method that we will use to create our light is kind of a trick way to do this. It will effect everything, but only illuminate what is near the car.
+                
+                To illuminate our car we will use a Spotlight. To create a spotlight we will simply create an instance of a Spotlight object and store it in a class variable.
+                    self.spot = Spotlight('car spot')
+                Next we will set its color. Use the same method as we used to change the color of Ambient Lights. Lets use a relativly low light for the color, (.4,.4,.4,1) would be a good color. Next we need to tweak the lens of the light. First we need to change the Field of View. Do it like this:
+                    self.spot.getLens().setFov(40)
+                After that we need to change the Near and Far ratio for the fallout of the light. Here is the code for that:
+                    self.spot.getLens().setNearFar(1000,3000)
+                We also want this light to cast shadows on our car as well as shadows of our car on to the ground. You can set any Spotlight or Directional light to cast shadows by calling setShadowCaster(True) on them.
+                
+                Finally we need to get the light placed in our world. As stated with the Ambient lights we need to attach these to empty nodes so that we can position and place them. Do this exactly like we did the ambient light. After the node is created set its position to (1000,1000,1000) and tell it to look at our car model. Lastly tell the entire world to be illuminated by calling:
+                    render.setLight(self.spotNode)
+                    
+                TEST: If you run your code now the car should be more brightly lit and a shadow of it cast onto the ground.
+                
+            Method: SetupCollisions(self)
+                Collisions are probably the most difficult to understand subjects in games. No collision system is perfect. In every game you can usually find a spot where collision doesn't work properly. As a result alot of the code will be given to you for this part. But please read through this section and try to understand what is going on.
+                
+                First we need to create a Collision traverser:
+                    base.cTrav = CollisionTraverser()
+                The CollisionTraverser does all of the work for us. It checks to see what collisions have occured and raises the proper flags for our collision system.
+                
+                Next we need to create some collision spheres so that we have something to collide with. We will attach these sphere to the car and the will serve as detectors for if we collide into another object. To detect a collision we need two objects. A From object and an Into object. A From object (our spheres) is an active object in the world. It is the object that collides Into another object. An Into object is one that a From object can collide into. These objects come in serveral types, but for you sake we have embeded the Into collision code into the world model itself so you don't have to worry about it. Lets create our spheres:
+                
+                    self.rearDecColSphere = self.car.attachNewNode(CollisionNode('rearSphere'))
+                    self.rearDecColSphere.node().addSolid(CollisionSphere(0,-130,80,80))
+                    self.rearDecColSphere.node().setIntoCollideMask(BitMask32.allOff())
+                    self.frontDecColSphere = self.car.attachNewNode(CollisionNode('frontSphere'))
+                    self.frontDecColSphere.node().addSolid(CollisionSphere(0,130,80,80))
+                    self.frontDecColSphere.node().setIntoCollideMask(BitMask32.allOff())
+                    self.rearColSphere = self.car.attachNewNode(CollisionNode('rearSphere'))
+                    self.rearColSphere.node().addSolid(CollisionSphere(0,-130,80,80))
+                    self.rearColSphere.node().setIntoCollideMask(BitMask32.allOff())
+                    self.frontColSphere = self.car.attachNewNode(CollisionNode('frontSphere'))
+                    self.frontColSphere.node().addSolid(CollisionSphere(0,130,80,80))
+                    self.frontColSphere.node().setIntoCollideMask(BitMask32.allOff())
+                  
+                This will create four spheres, two in the front of the car and two in the back. We will use 1 set of front and back to prevent us from running through walls, the other set will be used to determine when a collision has occured so we can apply the proper decceleration effect to the car. Basically for each sphere we create a CollisionNode and attach a CollisionSphere to it. We then set its IntoCollideMast to off so that it doesn't detect collisions with the other spheres around it.
+                
+                Next we need to create our Handlers for our collisions and attach our spheres to them. We will create two handlers. CollisionHandlerPusher will prevent our car from moving through walls. While CollisionHandlerQueue will help us know when a collision has occured. To create your handlers use:
+                
+                    self.handler = CollisionHandlerQueue()
+                    base.cTrav.addCollider(self.rearDecColSphere,self.handler)
+                    base.cTrav.addCollider(self.frontDecColSphere,self.handler)
+                    self.pusher = CollisionHandlerPusher()
+                    self.pusher.addCollider(self.rearColSphere,self.car)
+                    self.pusher.addCollider(self.frontColSphere,self.car)
+                    
+                Lastly we need to attach our handlers to the traverser so that the traverser can parse the information that the handlers provide. To attach the handlers use:
+                    
+                    base.cTrav.addCollider(self.rearColSphere,self.pusher)
+                    base.cTrav.addCollider(self.frontColSphere,self.pusher)
+                    
+                As said before Collision are some of the most complicated parts of games. If you wish to learn more about how Panda3D handles collisions you can find more information at https://www.panda3d.org/manual/index.php/Collision_Detection and its following pages.
+                
+                Basically what we have written will cause our car to stop and slide accross walls when it hits. This is handled by the CollisionHandlerPusher. And then CollisionHandlerQueue will be sending us information that a collision occured for future reference.
+                
+                TEST: You can test it now, but you will not see any difference. If there are no errors you are in good shape.
+                
+            Method: CarFrame(self):
+                So now that we have everything set up lets get our car moving and mechanics completed. This method will be called every frame just like our WorldFrame we wrote earlier. 
+                
+                First thing we need to do is check to see if our acceleration is not 0.
+                    If our acceleration is greater than 0 then we need to reduce the current acceleration by 25. If this would reduce the acceleration to below 0 we want to set the acceleration to 0. We will then want to call self.Forward since we are driving forward.
+                    
+                    If our acceleration is less than 0 then we need to increase the current acceleration by 10. If this would increase the acceleration to greater than 0 we want to set the acceleration to 0. We will then want to call self.Reverse since we are driving in reverse.
+                    
+            Method: Forward(self)
+                For Forward we want to move the car forward based on our acceleration. We also want to move the tires in a forward rotating fashion.
+                
+                First we will move the car forward. To do this you are going to set the car's Y position. Remember we only need to move it in the Y axis so we can call just setY(value) on the car like we did with the rotation. However we will be passing in two paramaters this time. Panda3D has several overloaded methods for each position. The default one is setY(value) in which it will set the objects position using render's coordinate system. The one we will use is setY(reference,value). This allows us to define a reference for our coordinate system. So as the car rotates the Y axis remains the same. This will allow our car to continue moving forward by only changing the Y axis. If we did it the other way we would have to calculate a large amount of Trigonomatry. So to move our car use setY(reference,value) on our car where reference is our car and the value as given below:
+                    +self.acceleration * globalClock.getDt()
+                Notice the + sign. It needs to be there to tell it we are adding to our movement not just setting it.
+                
+                After you have moved the car forward lets rotate the tires to look like they are spinning. On each of your 4 tires call setP(value) on the tire. Your values will be as follows.
+                    DriverFrontTire         self.DriverFrontTire.getP() + self.acceleration * 20 * globalClock.getDt()
+                    DriverRearTire          self.DriverRearTire.getP() + self.acceleration * 20 * globalClock.getDt()
+                    PassFrontTire           self.PassFrontTire.getP() - self.acceleration * 20 * globalClock.getDt()
+                    PassRearTire            self.PassRearTire.getP() - self.acceleration * 20 * globalClock.getDt()
+            
+            Method: Reverse(self)
+                Reverse is almost exactly the same as Forward just a few value changes. In fact you can just copy and paste Forward and change the following values:
+                    DriverFrontTire         self.DriverFrontTire.getP() - self.acceleration * 20 * globalClock.getDt()
+                    DriverRearTire          self.DriverRearTire.getP() - self.acceleration * 20 * globalClock.getDt()
+                    PassFrontTire           self.PassFrontTire.getP() + self.acceleration * 20 * globalClock.getDt()
+                    PassRearTire            self.PassRearTire.getP() + self.acceleration * 20 * globalClock.getDt()
+                    
+            Method: Accelerate(self)
+                Next we need to set up our acceleration.
+                    If our current acceleration is less than 0 we are driving backwards to we want to try to come to stop as fast as possible. As a result add 100 to the current acceleration.
+                    
+                    Else if it is less than 9000 (our max Speed) then we want to only add 50 to our current acceleration
+                    
+            Method: Deccelerate(self)
+                Much like Accelerate but our values are different.
+                    If our current acceleration is greater than 0 we are driving forwards so we want to try and come to a stop. Do this by subtracting 200 from the current acceleration
+                    
+                    Else if it is greater than -3000 (our max reverse Speed) then we will only subtract 20 from the current accleration.
+                    
+File: game.py
+    Code:
+        Method: GameLoop(self,task)
+            Now that we have those set up let go and head and setup our control checks and get our car moving forward and backwards. To do this the first thing we need to do is call our CarFrame in the GameLoop just like we did for WorldFrame. This can go before or after World Frame it doesn't matter.
+            
+            Next we will use our dictionary we set up earlier to detect if any keys are being pressed. Basically what we set up before if a specific key is pressed then its value will be changed to 1 in the dictionary. So all we have to do is check to see what that value is and respond accordingly. For now we will only set up Forward and Reverse. These checks should go after you called our CarFrame and WorldFrame.
+            
+            To set up a key check we are going to use an if statement. If "accelerate" in the keyMap is NOT 0 then it is being pressed. So we will call the Accelerate method we just wrote.
+            
+            Likewise if "deccelearte" is NOT 0 then it is being pressed. So we will call the Deccelerate method.
+            
+            If you are not sure how to find out what those values are, here is a little hint. You access a dictionary the same way as a list. You just use the key instead of an index.
+            
+            TEST: You should be able to run your program at this point. You should now be able to press 'A' to go forward and 'S' to go in reverse. It should also collide with a wall when you reach one.
+            
+            Now that we have that set up lets go a head and finish up this method and then move back to our car.
+            Just like our accelerate and deccelearte key bindings lets set up real quick the turn left and right. Use the same thing we did above accept call TurnLeft() on your car instance and TurnRight() on your car instance for their corisponding keys.
+            
+            We also want to do a check to see if niether the Left or Right keys are being pressed. If they are both equal to 0 in the dictionary then we are going to call StraigtenOut() on our car instance to straigten the wheels.
+            
+            Lastly to finish up this method we are going to check to see if we have collided with something. For this just call CollisionCheck() on the car instance. We will write it here shortly and it will do all of our work for us. Now lets jump back to our car.py file.
+            
+File: car.py
+    Code:
+        Method: TurnLeft(self)
+            This method will handle turning our car to the left.
+            First we will turn the tires. Use setH(value) on our tires. Remember only the front 2 tires turn on a car. 20 degrees should be enough for the Driver Side and 200 degrees for the Passenger Side.
+            
+            Next we want to check that we are moving since cars can't turn while sitting still. Set up and if statement that checks to see if our acceleration is not 0. If it is not 0 then we are going to turn the car. Use setH on the car its self using the following for its value:
+                self.car.getH()+100*globalClock.getDt()
+                
+            Remeber our light that is following us to illuminate the car and cast shadows. Well we are going to want to move that as well. We could leave it but our shadows would always be static. Dynamic Shadows are alot more impressive. While these dynamic shadows are not perfect, they will work for our assignment.
+            
+            First we need to set our current car angle to a temp variable. You can retrieve the temp angle in the format we need it in by using:
+                angle = abs(int(self.car.getH()))
+            That will give us the absolute integer angle of our car. Next we need to check if it is greater than 360 degrees. We do this because for some strange reason in Panda3D's back end our rotation will become very choppy if we give it values greater than 360. It can be give values greater, it just doesn't look as good. If the angle is greater than 360 store the angle divided by 360 into a variable. We will also need to recalculate a new angle if it is 360. Use this formula to do so:
+                angle = abs(angle-(360 * divider))
+            Where divider is your division result.
+            
+            Now regardless of whether the angle is greater than 360 or not we can set your car light position. To do this we need to do a bit of Trig. But to save you some headache if you are not good at Trig the formula is given to you here.
+                self.spotNode.setX(1000*math.cos(angle * globalClock.getDt()))
+                self.spotNode.setY(1000*math.sin(angle * globalClock.getDt()))
+                
+            Last thing you need to do for this is tell the spotNode to look at the car.
+            
+        Method: TurnRight(self)
+            This method is exactly the same except we change the angle tires turn to -20 degrees instead of 20 degrees and -200 degrees instead of 200. And Use this value for setH(value) on the car:
+                self.car.getH()+100*globalClock.getDt()
+                
+        Method: StraightenOut(self)
+            This method will straighten our tires out. Simply call setH(value) on our two tires and set them to 0 for the Driver side and 180 for the Passenger side.
+            
+        Method: CollisionCheck(self)
+            This is the last method you will write. First we will need to see if we have collided. If we have we will reduce our acceleration some to simulate hitting and dragging accross a wall.
+            
+            To check if we have collided we can simply get the number of events from the CollisionHandlerQueue we set up earlier. If there are 0 events then we have not collided. If there is anything greater than 0 we have collided with something. To get the number of events use:
+                self.handler.getNumEntries()
+            If the number that returns is greater than 0 we have collided so lets apply some friction. Before we do this we need to know what direction we were going. If our acceleration greater than 0 subtract 500 from the current acceleration. If it was less than 0 then add 500 to the current acceleration.
+
+            TEST: Your Project should be fully finished now with Part 2. You should be able to drive around, turn and collide into walls.
+            
+Part 2 Completion:
+    You are now done with Part 2. Test it completely to make sure everything works fine. Have fun and drive your car around the track several times.
